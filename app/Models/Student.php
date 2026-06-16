@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
+// WAJIB PAKAI INI:
+use Illuminate\Foundation\Auth\User as Authenticatable; 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Student extends Authenticatable
+// WAJIB EXTENDS Authenticatable (BUKAN Model)
+class Student extends Authenticatable 
 {
+    use HasFactory;
+    
+    // ... isi lainnya
     use HasFactory;
 
     protected $guarded = [];

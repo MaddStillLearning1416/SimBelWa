@@ -6,13 +6,27 @@ use App\Models\Student;
 use App\Models\StudentKrs;
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth; // 1. PASTIKAN IMPORT AUTH
 use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $mahasiswa = Student::with(['prodi.faculty', 'user'])->where('nim', '2410511116')->first();
+        // 2. Ambil data user yang sedang login saat ini
+        $user = Auth::user();
+
+        // 3. Cari data mahasiswa secara dinamis berdasarkan user yang login
+        // Hubungkan berdasarkan user_id (atau berdasarkan 'nim' jika kolom itu ada di tabel users Anda)
+        $mahasiswa = Student::with(['prodi.faculty', 'user'])
+            ->where('user_id', $user->id) 
+            ->first();
+
+        // Antisipasi jika data mahasiswa tidak ditemukan di database
+        if (!$mahasiswa) {
+            Auth::logout();
+            return redirect()->route('login')->withErrors(['nim' => 'Profil akademik Anda tidak ditemukan.']);
+        }
 
         Carbon::setLocale('id');
         $now = Carbon::now('Asia/Jakarta');
@@ -43,16 +57,13 @@ class DashboardController extends Controller
             return strtolower($item->courseClass->hari) === strtolower($namaHariIni);
         });
 
-        // --- LOGIKA BARU: AMBIL TIMELINE TUGAS ---
-        // 1. Ambil ID dari semua kelas yang diambil mahasiswa
+        // --- LOGIKA TIMELINE TUGAS ---
         $kelas_diambil = $krs->pluck('course_class_id')->toArray();
 
-        // 2. Cari tugas yang ID kelasnya ada di dalam daftar kelas mahasiswa
-        // Urutkan dari tenggat waktu terdekat (Ascending), dan ambil maksimal 3 tugas saja
         $tugas_mahasiswa = Task::with('courseClass.course')
             ->whereIn('course_class_id', $kelas_diambil)
             ->orderBy('tenggat_waktu', 'asc')
-            ->take(10) // Sekarang menampilkan hingga 10 tugas
+            ->take(10) 
             ->get();
 
         return view('dashboard', compact(

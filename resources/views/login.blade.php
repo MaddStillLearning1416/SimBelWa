@@ -75,7 +75,11 @@
             <div class="form-wrapper">
                 <h2 class="welcome-text">Selamat Datang 👋</h2>
                 <p class="instruction-text">Silakan masukkan NIM dan Password untuk mengakses akun akademik Anda.</p>
-
+                @if ($errors->any())
+                    <div style="background-color: #fef2f2; color: #dc2626; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; font-weight: 600; border: 1.5px solid #fca5a5; text-align: center;">
+                        {{ $errors->first() }}
+                    </div>
+                @endif
                 <form action="{{ route('login.post') }}" method="POST">
                     @csrf <div class="input-group">
                         <label for="nim">Nomor Induk Mahasiswa (NIM)</label>

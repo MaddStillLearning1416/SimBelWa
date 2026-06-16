@@ -3,35 +3,32 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\CourseClass;
 use App\Models\Task;
 use Carbon\Carbon;
 
 class TaskSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        // Menghapus data tugas lama agar tidak dobel saat di-seed ulang
-        Task::truncate();
+        // Cari ID Kelas berdasarkan Nama Mata Kuliah
+        $kelas_techno = CourseClass::whereHas('course', function($q){ $q->where('nama_mk', 'Technopreneurship'); })->first();
+        $kelas_iot    = CourseClass::whereHas('course', function($q){ $q->where('nama_mk', 'Internet Of Thing'); })->first();
+        $kelas_kdj    = CourseClass::whereHas('course', function($q){ $q->where('nama_mk', 'Keamanan Data dan Jaringan'); })->first();
+        $kelas_kripto = CourseClass::whereHas('course', function($q){ $q->where('nama_mk', 'Kriptografi'); })->first();
 
-        // Daftar banyak tugas
-        $daftar_tugas = [
-            ['course_class_id' => 1, 'judul' => 'Latihan Pertemuan 1 - Konsep Dasar', 'tenggat_waktu' => '2026-06-16 23:59:00'],
-            ['course_class_id' => 2, 'judul' => 'Tugas Mandiri: Analisis Jaringan', 'tenggat_waktu' => '2026-06-17 15:00:00'],
-            ['course_class_id' => 3, 'judul' => 'Kuis 1 - Pemrograman Web', 'tenggat_waktu' => '2026-06-18 10:00:00'],
-            ['course_class_id' => 1, 'judul' => 'Tugas Praktikum Modul 1 & 2', 'tenggat_waktu' => '2026-06-19 23:59:00'],
-            ['course_class_id' => 2, 'judul' => 'Makalah Keamanan Siber', 'tenggat_waktu' => '2026-06-20 08:00:00'],
-            ['course_class_id' => 3, 'judul' => 'Presentasi Proposal Projek', 'tenggat_waktu' => '2026-06-21 13:00:00'],
-            ['course_class_id' => 1, 'judul' => 'Review Jurnal Internasional', 'tenggat_waktu' => '2026-06-22 23:59:00'],
-            ['course_class_id' => 2, 'judul' => 'Latihan Pertemuan 3', 'tenggat_waktu' => '2026-06-24 23:59:00'],
-        ];
+        if ($kelas_techno && $kelas_iot && $kelas_kdj && $kelas_kripto) {
+            $tugas = [
+                ['course_class_id' => $kelas_techno->id, 'judul' => 'Prototyping UI/UX SmartWaste Route di Figma', 'tenggat_waktu' => Carbon::now()->addDays(1)->format('Y-m-d 23:59:00')],
+                ['course_class_id' => $kelas_iot->id,    'judul' => 'NETRA-SENSE: Integrasi Sensor Ultrasonik & IMU (Hardware)', 'tenggat_waktu' => Carbon::now()->addDays(3)->format('Y-m-d 15:00:00')],
+                ['course_class_id' => $kelas_kdj->id,    'judul' => 'Analisis Routing OSPF, EIGRP & Implementasi VLAN', 'tenggat_waktu' => Carbon::now()->addDays(5)->format('Y-m-d 10:00:00')],
+                ['course_class_id' => $kelas_techno->id, 'judul' => 'Finalisasi Proposal Bisnis Quesilova', 'tenggat_waktu' => Carbon::now()->addDays(7)->format('Y-m-d 23:59:00')],
+                ['course_class_id' => $kelas_kripto->id, 'judul' => 'Implementasi Algoritma Enkripsi di Python', 'tenggat_waktu' => Carbon::now()->addDays(10)->format('Y-m-d 12:00:00')],
+            ];
 
-        // Masukkan semua tugas ke database menggunakan looping
-        foreach ($daftar_tugas as $tugas) {
-            Task::create([
-                'course_class_id' => $tugas['course_class_id'],
-                'judul' => $tugas['judul'],
-                'tenggat_waktu' => Carbon::parse($tugas['tenggat_waktu'])
-            ]);
+            foreach ($tugas as $item) {
+                Task::create($item);
+            }
         }
     }
 }

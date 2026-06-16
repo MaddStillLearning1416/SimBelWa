@@ -1,21 +1,25 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\StudentKrs;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth; // <--- BARIS INI YANG WAJIB ADA      
 
 class KelasController extends Controller
 {
     // Fungsi untuk halaman utama "Kelas Mahasiswa" (Gambar 1)
     public function index()
     {
-        $mahasiswa = \App\Models\Student::with(['prodi.faculty', 'user'])->where('nim', '2410511116')->first();
+        // 1. Ambil data mahasiswa yang sedang login
+        $mahasiswa = Auth::guard('student')->user();
 
-        $kelas_list = \App\Models\StudentKrs::with(['courseClass.course', 'courseClass.lecturer'])
+        // 2. Ambil daftar kelas dari KRS mahasiswa tersebut
+        // Kita gunakan 'with' agar relasi ke mata kuliah dan dosen langsung ditarik (Eager Loading)
+        $kelas_list = StudentKrs::with(['courseClass.course', 'courseClass.lecturer'])
             ->where('student_id', $mahasiswa->id)
-            ->where('status_persetujuan', 'Disetujui')
             ->get();
 
+        // 3. Kirim data ke tampilan (sesuaikan nama 'kelas' dengan nama file blade kamu, misalnya kelas.blade.php)
         return view('kelas', compact('mahasiswa', 'kelas_list'));
     }
 
