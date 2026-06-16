@@ -178,7 +178,7 @@
                         <div class="stat-icon"><img src="{{ asset('tugas.png') }}" alt="Tugas"></div>
                         <div>
                             <div class="stat-title">Tugas Mata Kuliah</div>
-                            <div class="stat-value">10 <span>Tugas</span></div>
+                            <div class="stat-value">{{ $tugas_mahasiswa->count() }} <span>Tugas</span></div>
                         </div>
                     </div>
                     <div class="stat-card bg-red">
